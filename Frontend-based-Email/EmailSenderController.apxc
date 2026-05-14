@@ -1,0 +1,53 @@
+public class EmailSenderController {
+    
+    public String toAddress { get; set; }
+    public String subject { get; set; }
+    public String body { get; set; }
+    
+    // 'transient' prevents the file blob from breaking the Visualforce View State limit
+    public transient Blob fileBody { get; set; } 
+    public String fileName { get; set; }
+
+    public PageReference sendEmail() {
+        // 1. Validate the Email ID using Regex
+        String emailRegex = '^[a-zA-Z0-9._|\\\\%#~`=?&/$^*!}{+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$';
+        Pattern myPattern = Pattern.compile(emailRegex);
+        Matcher myMatcher = myPattern.matcher(toAddress);
+
+        if (!myMatcher.matches()) {
+            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Invalid Email Address. Please enter a valid format (e.g., user@domain.com).'));
+            return null; // Stop execution
+        }
+
+        try {
+            // 2. Setup the Email
+            Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+            mail.setToAddresses(new String[] { toAddress });
+            mail.setSubject(subject);
+            mail.setPlainTextBody(body);
+
+            // 3. Attach File (if provided)
+            if (fileBody != null && String.isNotBlank(fileName)) {
+                Messaging.EmailFileAttachment efa = new Messaging.EmailFileAttachment();
+                efa.setFileName(fileName);
+                efa.setBody(fileBody);
+                mail.setFileAttachments(new Messaging.EmailFileAttachment[] { efa });
+            }
+
+            // 4. Send the Email
+            Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.CONFIRM, 'Email sent successfully!'));
+
+            // 5. Clear the form fields
+            toAddress = '';
+            subject = '';
+            body = '';
+            fileName = null;
+
+        } catch (Exception e) {
+            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Failed to send email: ' + e.getMessage()));
+        }
+        
+        return null;
+    }
+}
