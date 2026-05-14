@@ -1,0 +1,276 @@
+College Management Lightning Application (Salesforce LWC)
+Step 1: Create Custom Objects
+
+Create 2 Custom Objects:
+
+1. Student Object
+
+Label: Student
+API Name: Student__c
+
+Fields:
+
+Field Label	Data Type
+Student Name	Text
+Roll Number	Number
+Marks	Number
+Email	Email
+2. Faculty Object
+
+Label: Faculty
+API Name: Faculty__c
+
+Fields:
+
+Field Label	Data Type
+Faculty Name	Text
+Faculty ID	Number
+Salary	Currency
+Department	Picklist
+Joining Date	Date
+
+Department Picklist Values:
+
+Computer
+IT
+Mechanical
+Civil
+AI&DS
+Step 2: Create Validation Rules
+Validation Rules for Student
+1. Marks should be between 0 and 100
+Rule Name:
+
+Student_Marks_Validation
+
+Formula:
+OR(
+    Marks__c < 0,
+    Marks__c > 100
+)
+Error Message:
+Marks must be between 0 and 100.
+2. Roll Number must be greater than 0
+Rule Name:
+
+Student_RollNo_Validation
+
+Formula:
+Roll_Number__c <= 0
+Error Message:
+Roll Number must be greater than 0.
+3. Email must contain @ symbol
+Rule Name:
+
+Student_Email_Validation
+
+Formula:
+NOT(CONTAINS(Email__c, "@"))
+Error Message:
+Email must contain @ symbol.
+4. Student Name cannot be blank
+Rule Name:
+
+Student_Name_Validation
+
+Formula:
+ISBLANK(Student_Name__c)
+Error Message:
+Student Name cannot be blank.
+Validation Rules for Faculty
+1. Faculty Name minimum 3 characters
+Rule Name:
+
+Faculty_Name_Validation
+
+Formula:
+LEN(Faculty_Name__c) < 3
+Error Message:
+Faculty Name must contain at least 3 characters.
+2. Faculty ID must be greater than 0
+Rule Name:
+
+Faculty_ID_Validation
+
+Formula:
+Faculty_ID__c <= 0
+Error Message:
+Faculty ID must be greater than 0.
+3. Salary Validation
+Rule Name:
+
+Faculty_Salary_Validation
+
+Formula:
+OR(
+    Salary__c < 10000,
+    Salary__c > 500000
+)
+Error Message:
+Salary must be between 10,000 and 500,000.
+4. Department must be selected
+Rule Name:
+
+Faculty_Department_Validation
+
+Formula:
+ISBLANK(TEXT(Department__c))
+Error Message:
+Please select Department.
+5. Joining Date cannot be future date
+Rule Name:
+
+Faculty_JoiningDate_Validation
+
+Formula:
+Joining_Date__c > TODAY()
+Error Message:
+Joining Date cannot be a future date.
+Step 3: Faculty ID Unique Constraint
+
+Go to:
+
+Faculty Object → Faculty ID Field
+
+Enable:
+
+✓ Unique
+Step 4: Create Lightning App
+
+Go to:
+
+Setup → App Manager → New Lightning App
+
+App Name:
+
+College Management System
+
+Add:
+
+Student Tab
+Faculty Tab
+Step 5: Create Tabs
+
+Go to:
+
+Setup → Tabs → New Custom Object Tab
+
+Create tabs for:
+
+Student
+Faculty
+Step 6: Test Cases
+Student
+Input	Expected Result
+Marks = 120	Error
+Roll No = -1	Error
+Email = abcgmail.com	Error
+Name blank	Error
+Faculty
+Input	Expected Result
+Name = ab	Error
+Salary = 700000	Error
+Department blank	Error
+Future joining date	Error
+Viva Questions
+What is Validation Rule?
+
+A validation rule prevents invalid data from being saved in Salesforce.
+
+Why use Validation Rules?
+
+To maintain data accuracy and consistency.
+
+Difference between Object and Field?
+Object stores records.
+Field stores attributes/data inside records.
+What is Lightning App?
+
+A collection of tabs and features in Salesforce Lightning Experience.
+
+What is Unique Field?
+
+A field that does not allow duplicate values.
+
+i was going to create a custom tab object and then  a new lightning app from that custom tab object but the custom tab object dropdown only allows 1 object so how do i combine student and faculty or how do i make the lightning app
+
+You should create 2 separate Custom Object Tabs first:
+
+Student Tab
+Faculty Tab
+
+Because Salesforce allows one tab = one object.
+
+So you do NOT combine Student and Faculty into one tab.
+
+Correct Flow
+Step 1 → Create Student Object
+
+Create:
+
+Student__c
+
+Then create its tab:
+
+Student Tab
+Step 2 → Create Faculty Object
+
+Create:
+
+Faculty__c
+
+Then create its tab:
+
+Faculty Tab
+Step 3 → Create Lightning App
+
+Now go to:
+
+Setup → App Manager → New Lightning App
+While Creating Lightning App
+
+After entering:
+
+App Name = College Management System
+
+Click:
+
+Next → Next
+
+Then you will reach:
+
+Navigation Items
+
+There you can add MULTIPLE tabs.
+
+Move these from left to right:
+
+Student
+Faculty
+
+using:
+
+Add >
+
+Now both objects appear inside ONE Lightning App.
+
+Final Result
+
+Inside your Lightning App:
+
+College Management System
+    ├── Student Tab
+    └── Faculty Tab
+
+So:
+
+Separate Objects
+Separate Tabs
+One Combined Lightning App
+Important
+
+The dropdown you saw during:
+
+New Custom Object Tab
+
+is only for selecting ONE object for ONE tab.
