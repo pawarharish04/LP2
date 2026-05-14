@@ -1,0 +1,288 @@
+Deployment of E-Commerce Web Application (Full Stack MERN Application) on AWS EC2
+
+Project Repository:
+LP2_projects GitHub Repository
+
+Project Used:
+
+mern-ecommerce
+Project Architecture
+React Frontend (Vite)
+        ↓
+Node.js + Express Backend
+        ↓
+MongoDB Database
+        ↓
+Hosted on AWS EC2 Ubuntu Server
+STEP 1 — Launch AWS EC2 Instance
+
+Open:
+
+AWS EC2 Console
+
+Create Instance:
+
+Ubuntu Server 22.04
+t2.micro
+Create/download key pair
+STEP 2 — Configure Security Group
+
+Add these Inbound Rules:
+
+Type	Port
+SSH	22
+HTTP	80
+HTTPS	443
+Custom TCP	5000
+Custom TCP	5173
+STEP 3 — Connect to EC2
+ssh -i your-key.pem ubuntu@YOUR_PUBLIC_IP
+
+Example:
+
+ssh -i aws.pem ubuntu@13.xx.xx.xx
+STEP 4 — Update Ubuntu Server
+sudo apt update && sudo apt upgrade -y
+STEP 5 — Install Node.js
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+
+sudo apt install -y nodejs
+
+Check:
+
+node -v
+npm -v
+STEP 6 — Install Git
+sudo apt install git -y
+
+Check:
+
+git --version
+STEP 7 — Clone GitHub Repository
+git clone https://github.com/prajwalmandlecha/LP2_projects.git
+
+Go project folder:
+
+cd LP2_projects/mern-ecommerce
+STEP 8 — Install MongoDB
+Import MongoDB Key
+curl -fsSL https://pgp.mongodb.com/server-7.0.asc | \
+sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg \
+--dearmor
+Add MongoDB Repository
+echo "deb [ arch=amd64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+Update Packages
+sudo apt update
+Install MongoDB
+sudo apt install -y mongodb-org
+Start MongoDB
+sudo systemctl start mongod
+
+Enable MongoDB:
+
+sudo systemctl enable mongod
+
+Check status:
+
+sudo systemctl status mongod
+
+You should see:
+
+Active: active (running)
+
+Press:
+
+q
+
+to exit.
+
+STEP 9 — Setup Backend
+
+Go backend folder:
+
+cd ~/LP2_projects/mern-ecommerce/backend
+
+Install dependencies:
+
+npm install
+STEP 10 — Create Backend .env File
+
+Create:
+
+nano .env
+
+Paste:
+
+PORT=5000
+MONGO_URI=mongodb://127.0.0.1:27017/ecommerce
+JWT_SECRET=mysecretkey
+
+Save:
+
+CTRL + O
+ENTER
+CTRL + X
+STEP 11 — Start Backend Server
+
+Run:
+
+npm start
+
+OR:
+
+node server.js
+
+Expected Output:
+
+MongoDB Connected
+Server running on port 5000
+STEP 12 — Test Backend
+
+Open browser:
+
+http://YOUR_PUBLIC_IP:5000
+
+Example:
+
+http://13.xx.xx.xx:5000
+STEP 13 — Open New Terminal for Frontend
+
+Reconnect EC2:
+
+ssh -i your-key.pem ubuntu@YOUR_PUBLIC_IP
+STEP 14 — Setup Frontend
+
+Go frontend folder:
+
+cd ~/LP2_projects/mern-ecommerce/frontend
+
+Install dependencies:
+
+npm install
+STEP 15 — Configure Frontend API URL
+
+Find API base URL file.
+
+Replace:
+
+http://localhost:5000
+
+with:
+
+http://YOUR_PUBLIC_IP:5000
+
+Example:
+
+http://13.xx.xx.xx:5000
+STEP 16 — Start Frontend
+
+Run:
+
+npm run dev -- --host 0.0.0.0
+
+You will see:
+
+Local:   http://localhost:5173
+Network: http://172.xx.xx.xx:5173
+STEP 17 — Open Frontend in Browser
+http://YOUR_PUBLIC_IP:5173
+
+Example:
+
+http://13.xx.xx.xx:5173
+
+Your MERN E-Commerce application is now deployed on AWS EC2.
+
+E-Commerce Features Demonstrated
+Product listing
+Product browsing
+Add to cart
+Purchase simulation
+Backend APIs
+MongoDB database connectivity
+Frontend + Backend deployment
+Important Notes
+Keep backend terminal running.
+Keep frontend terminal running.
+If terminal closes, application stops.
+Use separate terminals for frontend and backend.
+Final URLs
+Component	URL
+Frontend	http://EC2-IP:5173
+Backend	http://EC2-IP:5000
+Viva Questions
+What is EC2?
+
+Amazon Elastic Compute Cloud provides virtual servers on AWS cloud.
+
+What is MERN Stack?
+MongoDB
+Express.js
+React.js
+Node.js
+Why MongoDB?
+
+MongoDB stores document-based NoSQL data.
+
+What is Express.js?
+
+Backend framework for Node.js used for APIs and routing.
+
+Why use React?
+
+React provides reusable frontend UI components.
+
+Why open port 5000?
+
+Backend server runs on port 5000.
+
+Why open port 5173?
+
+Vite React frontend runs on port 5173.
+
+What is Security Group?
+
+AWS firewall that controls server traffic.
+
+Why use --host 0.0.0.0?
+
+Allows frontend hosted on EC2 to be accessible publicly.
+
+Complete Commands Summary
+sudo apt update && sudo apt upgrade -y
+
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+
+sudo apt install -y nodejs
+
+sudo apt install git -y
+
+git clone https://github.com/prajwalmandlecha/LP2_projects.git
+
+cd LP2_projects/mern-ecommerce
+
+curl -fsSL https://pgp.mongodb.com/server-7.0.asc | \
+sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg \
+--dearmor
+
+echo "deb [ arch=amd64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+
+sudo apt update
+
+sudo apt install -y mongodb-org
+
+sudo systemctl start mongod
+
+sudo systemctl enable mongod
+
+cd ~/LP2_projects/mern-ecommerce/backend
+
+npm install
+
+npm start
+
+cd ~/LP2_projects/mern-ecommerce/frontend
+
+npm install
+
+npm run dev -- --host 0.0.0.0
