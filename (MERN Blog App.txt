@@ -1,0 +1,86 @@
+Connect to EC2
+ssh -i "st.pem" ubuntu@ec2-3-91-70-211.compute-1.amazonaws.com
+Clone Project
+git clone https://github.com/prajwalmandlecha/LP2_projects.git
+cd LP2_projects/mern-blog-app
+Backend Setup
+cd backend
+npm install
+Install MongoDB
+sudo apt-get update
+sudo apt-get install -y gnupg curl
+
+curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | \
+sudo gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg --dearmor
+
+echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse" | \
+sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
+
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+Fix MongoDB Issue (Kernel Compatibility)
+
+This was the important fix:
+
+sudo mkdir -p /etc/systemd/system/mongod.service.d
+sudo nano /etc/systemd/system/mongod.service.d/override.conf
+
+Add:
+
+[Service]
+Environment="GLIBC_TUNABLES=glibc.pthread.rseq=0"
+
+Then:
+
+sudo systemctl daemon-reload
+sudo systemctl restart mongod
+sudo systemctl enable mongod
+sudo systemctl status mongod
+Check MongoDB
+mongosh
+Frontend Setup
+cd ~/LP2_projects/mern-blog-app/frontend
+npm install
+Build React/Vite Frontend
+npm run build
+Move Frontend Build to Nginx
+sudo mv ./* ~/LP2_projects/mern-blog-app/frontend
+
+cd dist
+sudo mv ./* /var/www/html/
+Start Backend
+cd ~/LP2_projects/mern-blog-app/backend
+
+npm start
+
+Output:
+
+Connected to Local MongoDB
+Server is running on port 5000
+Important AWS Security Rule
+
+You mentioned you also added inbound rule for port 5000.
+
+In AWS EC2 Security Group:
+
+Add inbound rules:
+
+Type	Port	Source
+HTTP	80	Anywhere
+Custom TCP	5000	Anywhere
+SSH	22	My IP
+Useful Commands
+Check MongoDB Status
+sudo systemctl status mongod
+Check MongoDB Logs
+sudo journalctl -u mongod.service --no-pager -n 20
+Restart MongoDB
+sudo systemctl restart mongod
+Restart Backend
+npm start
+Check Running Port
+sudo lsof -i :5000
+Install Nginx (if needed)
+sudo apt install nginx -y
+sudo systemctl start nginx
+sudo systemctl enable nginx
