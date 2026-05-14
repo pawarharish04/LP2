@@ -1,0 +1,206 @@
+Step 1: Launch EC2 Instance
+
+Go to: AWS Console
+
+Open:
+
+EC2 Dashboard
+Configure Instance
+Name: StaticWebsiteServer
+AMI: Ubuntu Server 22.04 LTS
+Instance type: t2.micro (Free Tier)
+Key Pair: Create/download .pem
+Network Settings
+
+Allow:
+
+✅ SSH (Port 22)
+✅ HTTP (Port 80)
+✅ HTTPS (Port 443)
+
+Then click:
+
+Launch Instance
+Step 2: Connect to EC2
+
+From terminal:
+
+chmod 400 mykey.pem
+
+ssh -i mykey.pem ubuntu@YOUR_PUBLIC_IP
+
+Example:
+
+ssh -i awskey.pem ubuntu@13.233.xx.xx
+Step 3: Update Server
+sudo apt update
+sudo apt upgrade -y
+Step 4: Install Web Server
+Option A: Nginx (Recommended)
+sudo apt install nginx -y
+
+Start service:
+
+sudo systemctl start nginx
+sudo systemctl enable nginx
+
+Check status:
+
+sudo systemctl status nginx
+Step 5: Open Website Folder
+
+Default folder:
+
+cd /var/www/html
+
+Remove default page:
+
+sudo rm index.nginx-debian.html
+Step 6: Create Static Website
+
+Create HTML file:
+
+sudo nano index.html
+
+Paste:
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AWS Static Website</title>
+    <style>
+        body{
+            font-family: Arial;
+            background:#111827;
+            color:white;
+            text-align:center;
+            padding-top:100px;
+        }
+        h1{
+            color:#38bdf8;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Website Hosted on AWS EC2</h1>
+<p>Successfully deployed static website on cloud VM.</p>
+
+</body>
+</html>
+
+Save:
+
+CTRL + O
+Enter
+CTRL + X
+Step 7: Access Website Publicly
+
+Open browser:
+
+http://YOUR_PUBLIC_IP
+
+Example:
+
+http://13.233.xx.xx
+
+Your website should appear publicly.
+
+Step 8: Configure Security Group
+
+In EC2:
+
+Select Instance
+Security
+Security Groups
+Edit Inbound Rules
+
+Ensure:
+
+Type	Port
+SSH	22
+HTTP	80
+HTTPS	443
+
+Source:
+
+0.0.0.0/0
+Step 9: Enable Remote Updates
+
+You can remotely update files anytime using:
+
+Method 1: SSH + Nano
+ssh -i mykey.pem ubuntu@PUBLIC_IP
+
+Edit:
+
+sudo nano /var/www/html/index.html
+Method 2: SCP Upload
+
+Upload local files directly:
+
+scp -i mykey.pem index.html ubuntu@PUBLIC_IP:/tmp
+
+Move to web folder:
+
+sudo mv /tmp/index.html /var/www/html/
+Step 10: Optional Domain Setup
+
+Use:
+
+Route 53
+
+Map domain → EC2 public IP.
+
+Step 11: Optional HTTPS Setup
+
+Install Certbot:
+
+sudo apt install certbot python3-certbot-nginx -y
+
+Run:
+
+sudo certbot --nginx
+Architecture Diagram
+User Browser
+      ↓
+Public IP / Domain
+      ↓
+AWS EC2 Instance
+      ↓
+Nginx Web Server
+      ↓
+Static HTML/CSS Website
+Commands Summary
+sudo apt update
+sudo apt install nginx -y
+cd /var/www/html
+sudo nano index.html
+sudo systemctl restart nginx
+Viva Questions & Answers
+1. What is EC2?
+
+Amazon Web Services EC2 is a virtual server service used to launch cloud-based virtual machines.
+
+2. What is a static website?
+
+A website containing fixed HTML/CSS/JS content without backend processing.
+
+3. Why use Nginx?
+
+Nginx is lightweight, fast, and efficient for serving static websites.
+
+4. What is a Security Group?
+
+A virtual firewall controlling inbound and outbound traffic.
+
+5. Difference between public and private IP?
+Public IP → accessible from internet
+Private IP → internal AWS communication only
+6. Why open port 80?
+
+Port 80 allows HTTP web traffic.
+
+7. Why use SSH?
+
+SSH securely accesses and manages remote servers.
