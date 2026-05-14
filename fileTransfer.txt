@@ -1,0 +1,177 @@
+CC – Secure File Sharing Between Cloud Instances (AWS)
+Aim
+
+Create a secure cloud-based environment where two EC2 virtual machines communicate within a virtual network and securely transfer files with proper access permissions.
+
+Architecture
+6
+
+Components used:
+
+Amazon Web Services
+Amazon EC2
+VPC (Virtual Private Cloud)
+Security Groups
+SSH
+SCP/SFTP
+Requirements
+AWS Services
+AWS Account
+2 EC2 Instances (Ubuntu preferred)
+Same VPC/Subnet
+Key Pair (.pem file)
+Step-by-Step Implementation
+Step 1: Launch Two EC2 Instances
+
+Go to:
+
+AWS Console
+
+Launch:
+
+Instance 1 → Sender-VM
+Instance 2 → Receiver-VM
+
+Configuration:
+
+Ubuntu Server 22.04
+t2.micro
+Same VPC
+Same subnet or connected subnet
+
+Allow in Security Group:
+
+SSH (Port 22)
+Custom TCP if needed
+Step 2: Connect to EC2 Instances
+
+From local terminal:
+
+ssh -i mykey.pem ubuntu@PUBLIC_IP_1
+
+Connect to second VM similarly.
+
+Step 3: Verify Private Network Communication
+
+Inside VM1:
+
+ping PRIVATE_IP_VM2
+
+Example:
+
+ping 172.31.20.15
+
+If packets are received → communication established.
+
+Step 4: Create a Test File on Sender VM
+
+Inside VM1:
+
+echo "Cloud Computing Practical" > sample.txt
+
+Verify:
+
+cat sample.txt
+Step 5: Secure File Transfer Using SCP
+
+From VM1 transfer file to VM2:
+
+scp -i mykey.pem sample.txt ubuntu@PRIVATE_IP_VM2:/home/ubuntu/
+
+Example:
+
+scp -i awskey.pem sample.txt ubuntu@172.31.20.15:/home/ubuntu/
+Step 6: Verify File on Receiver VM
+
+Login to VM2:
+
+ls
+
+Open file:
+
+cat sample.txt
+
+Expected Output:
+
+Cloud Computing Practical
+Step 7: Set Proper File Permissions
+
+On Receiver VM:
+
+chmod 600 sample.txt
+
+Check permissions:
+
+ls -l sample.txt
+
+Explanation:
+
+Owner → read/write
+Others → no access
+Security Configuration
+Security Group Rules
+Type	Protocol	Port	Source
+SSH	TCP	22	Your IP
+Internal Communication	All Traffic	Custom	Same Security Group
+Optional Enhancement (Recommended)
+Configure Passwordless Secure Sharing
+
+Generate SSH key in VM1:
+
+ssh-keygen
+
+Copy public key to VM2:
+
+ssh-copy-id ubuntu@PRIVATE_IP_VM2
+
+Now file transfer works without password prompt.
+
+Commands Summary
+# Connect to VM
+ssh -i key.pem ubuntu@ip
+
+# Create file
+echo "Hello" > file.txt
+
+# Transfer file securely
+scp -i key.pem file.txt ubuntu@private-ip:/home/ubuntu/
+
+# Verify
+cat file.txt
+
+# Permissions
+chmod 600 file.txt
+Output
+
+Successful secure file transfer between two AWS EC2 instances using private networking and SCP with controlled permissions.
+
+Advantages
+Secure communication inside VPC
+Encrypted file transfer using SSH/SCP
+Controlled access permissions
+Scalable cloud infrastructure
+Viva Questions
+What is SCP?
+
+Secure Copy Protocol used to transfer files securely over SSH.
+
+Why use Private IP instead of Public IP?
+
+Private IP communication is faster, secure, and avoids internet exposure.
+
+What is a Security Group?
+
+A virtual firewall controlling inbound and outbound traffic.
+
+What does chmod 600 mean?
+
+600=4+2+0
+
+Owner → read/write
+Group → no permission
+Others → no permission
+Difference between SCP and SFTP?
+SCP	SFTP
+Simple copy	Interactive transfer
+Faster	More features
+Non-interactive	File browsing supported
