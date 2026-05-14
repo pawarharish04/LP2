@@ -1,0 +1,222 @@
+CC - Bank Account System
+Problem Statement
+
+Develop a menu-driven Bank Account System that manages customer records
+(Customer ID, Customer Name, Email, Account Type, Balance) in Salesforce using console based.
+
+STEP 1 — Create Custom Object
+
+Go to:
+
+Setup → Object Manager → Create → Custom Object
+
+Fill:
+
+Field	Value
+Label	Customer
+Plural Label	Customers
+Object Name	Customer
+Record Name	Customer Name
+
+Save.
+
+STEP 2 — Create Required Fields
+
+Inside Customer__c → Fields & Relationships → New
+
+Create these fields:
+
+Label	Type
+Customer ID	Number
+Email	Email
+Account Type	Text
+Balance	Currency
+STEP 3 — Create Apex Class
+
+Developer Console → File → New → Apex Class
+
+Class Name:
+
+BankAccountSystem
+
+Paste this code:
+
+public class BankAccountSystem {
+
+    // ADD CUSTOMER
+    public static void addCustomer(
+        Integer customerId,
+        String customerName,
+        String email,
+        String accountType,
+        Decimal balance
+    ) {
+
+        Customer__c cust = new Customer__c();
+
+        cust.Name = customerName;
+        cust.Customer_ID__c = customerId;
+        cust.Email__c = email;
+        cust.Account_Type__c = accountType;
+        cust.Balance__c = balance;
+
+        insert cust;
+
+        System.debug('Customer Added Successfully');
+    }
+
+    // VIEW CUSTOMERS
+    public static void viewCustomers() {
+
+        List<Customer__c> custList = [
+
+            SELECT Id,
+                   Name,
+                   Customer_ID__c,
+                   Email__c,
+                   Account_Type__c,
+                   Balance__c
+            FROM Customer__c
+        ];
+
+        for(Customer__c c : custList) {
+
+            System.debug(
+
+                'Customer ID: ' + c.Customer_ID__c +
+                ' | Name: ' + c.Name +
+                ' | Email: ' + c.Email__c +
+                ' | Account Type: ' + c.Account_Type__c +
+                ' | Balance: ' + c.Balance__c
+            );
+        }
+    }
+
+    // UPDATE BALANCE
+    public static void updateBalance(
+        Integer customerId,
+        Decimal newBalance
+    ) {
+
+        Customer__c cust = [
+
+            SELECT Id, Balance__c
+            FROM Customer__c
+            WHERE Customer_ID__c = :customerId
+            LIMIT 1
+        ];
+
+        cust.Balance__c = newBalance;
+
+        update cust;
+
+        System.debug('Balance Updated Successfully');
+    }
+
+    // DELETE CUSTOMER
+    public static void deleteCustomer(Integer customerId) {
+
+        Customer__c cust = [
+
+            SELECT Id
+            FROM Customer__c
+            WHERE Customer_ID__c = :customerId
+            LIMIT 1
+        ];
+
+        delete cust;
+
+        System.debug('Customer Deleted Successfully');
+    }
+
+    // MENU DRIVEN METHOD
+    public static void showMenu(Integer choice) {
+
+        if(choice == 1) {
+
+            addCustomer(
+                101,
+                'Harry',
+                'harry@gmail.com',
+                'Savings',
+                50000
+            );
+        }
+
+        else if(choice == 2) {
+
+            viewCustomers();
+        }
+
+        else if(choice == 3) {
+
+            updateBalance(101, 75000);
+        }
+
+        else if(choice == 4) {
+
+            deleteCustomer(101);
+        }
+
+        else {
+
+            System.debug('Invalid Choice');
+        }
+    }
+}
+
+Save the file.
+
+STEP 4 — Execute Program
+
+Go to:
+
+Debug → Open Execute Anonymous Window
+
+Paste:
+
+// 1 = Add Customer
+BankAccountSystem.showMenu(1);
+
+// 2 = View Customers
+BankAccountSystem.showMenu(2);
+
+// 3 = Update Balance
+BankAccountSystem.showMenu(3);
+
+// 4 = Delete Customer
+// BankAccountSystem.showMenu(4);
+
+Click:
+
+Execute
+STEP 5 — Check Output
+
+Go to:
+
+Debug → Logs
+
+Open latest log.
+
+Output:
+
+Customer Added Successfully
+
+Customer ID: 101 | Name: Harry
+| Email: harry@gmail.com
+| Account Type: Savings
+| Balance: 50000
+
+Balance Updated Successfully
+Viva Questions
+What is Apex?
+
+Apex is a programming language used in Salesforce for backend logic.
+
+What is SOQL?
+
+Salesforce Object Query Language used to fetch records.
+
+Example:
+
+SELECT Name FROM Customer__c
