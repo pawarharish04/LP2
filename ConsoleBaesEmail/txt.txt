@@ -1,0 +1,140 @@
+Open Setup
+Click ⚙️ → Developer Console
+Step 2: Create Apex Class
+
+Inside Developer Console:
+
+Click File → New → Apex Class
+Class Name:
+ConsoleEmailSender
+Click OK
+
+Now replace everything with your code:
+
+
+public class ConsoleEmailSender {
+    
+    // A single method that handles both standard emails and emails with attachments
+    public static void sendEmail(String toAddress, String subject, String body, String fileName, Blob fileContent) {
+        
+        // Basic validation
+        if (String.isBlank(toAddress)) {
+            System.debug('ERROR: Recipient email address is required.');
+            return;
+        }
+
+        try {
+            // 1. Setup the Email
+            Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+            mail.setToAddresses(new String[] { toAddress });
+            mail.setSubject(subject);
+            mail.setPlainTextBody(body);
+
+            // 2. Attach File (Only if fileName and fileContent are provided)
+            if (fileContent != null && String.isNotBlank(fileName)) {
+                Messaging.EmailFileAttachment efa = new Messaging.EmailFileAttachment();
+                efa.setFileName(fileName);
+                efa.setBody(fileContent);
+                mail.setFileAttachments(new Messaging.EmailFileAttachment[] { efa });
+                System.debug('Attachment added: ' + fileName);
+            }
+
+            // 3. Send the Email
+            Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+            System.debug('SUCCESS: Email sent successfully to -> ' + toAddress);
+
+        } catch (Exception e) {
+            System.debug('ERROR: Failed to send email: ' + e.getMessage());
+        }
+    }
+}
+
+Save using:
+
+Ctrl + S
+Step 3: Open Execute Anonymous Window
+
+In Developer Console:
+
+Debug → Open Execute Anonymous Window
+
+Shortcut:
+
+Ctrl + E
+Step 4: Test Without Attachment
+
+Paste this:
+
+ConsoleEmailSender.sendEmail(
+    'yourmail@gmail.com',
+    'Test Email from Salesforce',
+    'Hello! This is a test email sent using Apex.',
+    null,
+    null
+);
+
+Click:
+
+Execute
+Step 5: Check Debug Logs
+
+After execution:
+
+Logs → Open Latest Log
+
+You should see:
+
+SUCCESS: Email sent successfully
+Step 6: Check Your Email Inbox
+
+Open Gmail/Outlook.
+
+You should receive:
+
+Subject
+Message body
+
+from Salesforce.
+
+Step 7: Test With Attachment
+
+Again open:
+
+Debug → Open Execute Anonymous Window
+
+Paste:
+
+Blob fileData = Blob.valueOf('This is sample attachment content.');
+
+ConsoleEmailSender.sendEmail(
+    'yourmail@gmail.com',
+    'Email With Attachment',
+    'Please find attached file.',
+    'sample.txt',
+    fileData
+);
+
+Click:
+
+Execute
+Step 8: Verify Attachment
+
+Check inbox again.
+
+You should receive:
+
+sample.txt
+
+attachment.
+
+Step 9: Enable Email Deliverability (IMPORTANT)
+
+If mail is not received:
+
+Go to:
+
+Setup → Deliverability
+
+Set:
+
+Access Level = All Email
