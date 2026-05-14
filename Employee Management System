@@ -1,0 +1,204 @@
+CC - Employee Management System
+Problem Statement
+
+Develop a menu-driven Employee Management System that manages employee records
+(Emp ID, Emp Name, Email, Birth Date, Department) in Salesforce using console based.
+
+STEP 1 — Create Custom Object
+
+Go to:
+
+Setup → Object Manager → Create → Custom Object
+
+Fill:
+
+Field	Value
+Label	Employee
+Plural Label	Employees
+Object Name	Employee
+Record Name	Employee Name
+
+Save.
+
+STEP 2 — Create Required Fields
+
+Inside Employee__c → Fields & Relationships → New
+
+Create these fields:
+
+Label	Type
+Emp ID	Number
+Email	Email
+Birth Date	Date
+Department	Text
+STEP 3 — Create Apex Class
+
+Developer Console → File → New → Apex Class
+
+Class Name:
+
+EmployeeManagementSystem
+
+Paste this code:
+
+public class EmployeeManagementSystem {
+
+    // ADD EMPLOYEE
+    public static void addEmployee(
+        Integer empId,
+        String empName,
+        String email,
+        Date birthDate,
+        String department
+    ) {
+
+        Employee__c emp = new Employee__c();
+
+        emp.Name = empName;
+        emp.Emp_ID__c = empId;
+        emp.Email__c = email;
+        emp.Birth_Date__c = birthDate;
+        emp.Department__c = department;
+
+        insert emp;
+
+        System.debug('Employee Added Successfully');
+    }
+
+    // VIEW EMPLOYEES
+    public static void viewEmployees() {
+
+        List<Employee__c> empList = [
+            SELECT Id,
+                   Name,
+                   Emp_ID__c,
+                   Email__c,
+                   Birth_Date__c,
+                   Department__c
+            FROM Employee__c
+        ];
+
+        for(Employee__c e : empList) {
+
+            System.debug(
+                'Emp ID: ' + e.Emp_ID__c +
+                ' | Name: ' + e.Name +
+                ' | Email: ' + e.Email__c +
+                ' | Birth Date: ' + e.Birth_Date__c +
+                ' | Department: ' + e.Department__c
+            );
+        }
+    }
+
+    // UPDATE EMPLOYEE DEPARTMENT
+    public static void updateDepartment(
+        Integer empId,
+        String newDepartment
+    ) {
+
+        Employee__c emp = [
+            SELECT Id, Department__c
+            FROM Employee__c
+            WHERE Emp_ID__c = :empId
+            LIMIT 1
+        ];
+
+        emp.Department__c = newDepartment;
+
+        update emp;
+
+        System.debug('Department Updated Successfully');
+    }
+
+    // DELETE EMPLOYEE
+    public static void deleteEmployee(Integer empId) {
+
+        Employee__c emp = [
+            SELECT Id
+            FROM Employee__c
+            WHERE Emp_ID__c = :empId
+            LIMIT 1
+        ];
+
+        delete emp;
+
+        System.debug('Employee Deleted Successfully');
+    }
+
+    // MENU DRIVEN METHOD
+    public static void showMenu(Integer choice) {
+
+        if(choice == 1) {
+
+            addEmployee(
+                101,
+                'Harry',
+                'harry@gmail.com',
+                Date.newInstance(2003, 5, 10),
+                'IT'
+            );
+        }
+
+        else if(choice == 2) {
+
+            viewEmployees();
+        }
+
+        else if(choice == 3) {
+
+            updateDepartment(101, 'HR');
+        }
+
+        else if(choice == 4) {
+
+            deleteEmployee(101);
+        }
+
+        else {
+
+            System.debug('Invalid Choice');
+        }
+    }
+}
+
+Save the file.
+
+STEP 4 — Execute Program
+
+Go to:
+
+Debug → Open Execute Anonymous Window
+
+Paste:
+
+// 1 = Add Employee
+EmployeeManagementSystem.showMenu(1);
+
+// 2 = View Employees
+EmployeeManagementSystem.showMenu(2);
+
+// 3 = Update Department
+EmployeeManagementSystem.showMenu(3);
+
+// 4 = Delete Employee
+// EmployeeManagementSystem.showMenu(4);
+
+Click:
+
+Execute
+STEP 5 — Check Output
+
+Go to:
+
+Debug → Logs
+
+Open latest log.
+
+You will see output like:
+
+Employee Added Successfully
+
+Emp ID: 101 | Name: Harry | Email: harry@gmail.com
+| Birth Date: 2003-05-10 | Department: IT
+
+Department Updated Successfully
