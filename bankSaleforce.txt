@@ -1,355 +1,179 @@
-Step 2: Open Salesforce Setup
-
-After login:
-
-Click ⚙️ (top right) → Setup
-
-You’ll enter Salesforce Setup dashboard.
-
-Step 3: Create Custom Object
-
-In Setup:
-
-Search:
-Object Manager
-
-Open:
-👉 Object Manager
-
-Then:
-👉 Create → Custom Object
-
-Fill:
-
-Field	Value
-Label	BankAccount
-Plural Label	BankAccounts
-Object Name	BankAccount
-Record Name	Emp ID
-Data Type	Text
-
-✔ Check:
-
-Allow Reports
-Allow Activities
-
-Then:
-👉 Save
-
-Step 4: Create Fields
-
-Now inside:
-BankAccount
-
+Bank Account System using Salesforce Visualforce (VFP)
+Aim
+Develop a menu-driven Bank Account System in Salesforce using Custom Object, Apex Controller, and Visualforce Page (VFP).
+Technologies Used
+• Salesforce
+• Apex
+• Visualforce
+• SOQL
+• DML Operations
+Project Architecture
+Visualforce Page (UI)
+        ↓
+Apex Controller
+        ↓
+Customer__c Object
+        ↓
+Salesforce Database
+Step 1 - Create Salesforce Developer Account
+Visit https://developer.salesforce.com/signup and create a developer account.
+Step 2 - Create Custom Object
 Go to:
-👉 Fields & Relationships
-
-Then click:
-👉 New
-
-Create Field 1 → Emp Name
-
-Choose:
-👉 Text
-
-Click Next
+Setup → Object Manager → Create → Custom Object
 
 Fill:
+Label: Customer
+Plural Label: Customers
+Object Name: Customer
+Record Name: Customer Name
+Step 3 - Create Fields
+1. Email Field
+API Name: Email__c
 
-Field	Value
-Field Label	Emp Name
-Length	50
+2. Birth Date Field
+API Name: Birth_Date__c
 
-Click:
-👉 Next → Next → Save
+3. Department Field
+API Name: Department__c
+Step 4 - Open Developer Console
+Gear Icon → Developer Console
+Step 5 - Create Apex Controller
+File → New → Apex Class
+Class Name: BankVFController
+Apex Controller Code
+public class BankVFController {
 
-Create Field 2 → Email
+    public String customerName {get; set;}
+    public String email {get; set;}
+    public Date birthDate {get; set;}
+    public String department {get; set;}
 
-Again:
-👉 New
+    public List<Customer__c> customerList {get; set;}
 
-Choose:
-👉 Email
-
-Fill:
-
-Field	Value
-Field Label	Email
-
-Click:
-👉 Next → Next → Save
-
-Create Field 3 → Birth Date
-
-Again:
-👉 New
-
-Choose:
-👉 Date
-
-Fill:
-
-Field	Value
-Field Label	Birth Date
-
-Click:
-👉 Next → Next → Save
-
-Create Field 4 → Department
-
-Again:
-👉 New
-
-Choose:
-👉 Picklist
-
-Fill:
-
-Field	Value
-Field Label	Department
-
-Values:
-
-Savings
-Current
-Loans
-Credit Card
-Customer Service
-Investment
-
-Then:
-👉 Next → Next → Save
-
-Step 5: Open Developer Console
-
-Top Right:
-⚙️ → Developer Console
-
-A new window opens.
-
-Step 6: Create Apex Class
-
-In Developer Console:
-
-👉 File → New → Apex Class
-
-Class Name:
-BankAccountSystem
-
-Click:
-👉 OK
-
-Delete existing code and paste this:
-
-public class BankAccountSystem {
-
-    // Add Account
-    public static void addAccount(String accId, String name, String email, Date dob, String dept) {
-
-        BankAccount__c acc = new BankAccount__c();
-
-        acc.Name = accId;
-        acc.Emp_Name__c = name;
-        acc.Email__c = email;
-        acc.Birth_Date__c = dob;
-        acc.Department__c = dept;
-
-        insert acc;
-
-        System.debug('Account Added Successfully!');
+    public BankVFController() {
+        loadCustomers();
     }
 
-    // View Accounts
-    public static void viewAccounts() {
+    public void loadCustomers() {
 
-        List<BankAccount__c> accList = [
-            SELECT Name, Emp_Name__c, Email__c,
-                   Birth_Date__c, Department__c
-            FROM BankAccount__c
+        customerList = [
+            SELECT Id,
+                   Name,
+                   Email__c,
+                   Birth_Date__c,
+                   Department__c
+            FROM Customer__c
+            ORDER BY CreatedDate DESC
         ];
-
-        for(BankAccount__c acc : accList) {
-
-            System.debug('Account ID: ' + acc.Name);
-            System.debug('Name: ' + acc.Emp_Name__c);
-            System.debug('Email: ' + acc.Email__c);
-            System.debug('DOB: ' + acc.Birth_Date__c);
-            System.debug('Department: ' + acc.Department__c);
-
-            System.debug('----------------------');
-        }
     }
 
-    // Update Account
-    public static void updateAccount(String accId, String newEmail) {
+    public void addCustomer() {
 
-        BankAccount__c acc = [
-            SELECT Id, Email__c
-            FROM BankAccount__c
-            WHERE Name = :accId
-            LIMIT 1
-        ];
+        Customer__c cust = new Customer__c();
 
-        acc.Email__c = newEmail;
+        cust.Name = customerName;
+        cust.Email__c = email;
+        cust.Birth_Date__c = birthDate;
+        cust.Department__c = department;
 
-        update acc;
+        insert cust;
 
-        System.debug('Account Updated Successfully!');
+        loadCustomers();
     }
 
-    // Delete Account
-    public static void deleteAccount(String accId) {
+    public void deleteCustomer() {
 
-        BankAccount__c acc = [
+        String custId =
+            ApexPages.currentPage()
+            .getParameters()
+            .get('custId');
+
+        Customer__c cust = [
             SELECT Id
-            FROM BankAccount__c
-            WHERE Name = :accId
+            FROM Customer__c
+            WHERE Id = :custId
             LIMIT 1
         ];
 
-        delete acc;
+        delete cust;
 
-        System.debug('Account Deleted Successfully!');
+        loadCustomers();
     }
 }
+Step 6 - Create Visualforce Page
+File → New → Visualforce Page
+Page Name: BankVFPage
+Visualforce Page Code
+<apex:page controller="BankVFController">
 
-Then:
-👉 File → Save
+    <apex:form>
 
-OR
+        <apex:pageBlock title="Bank Account System">
 
-Press:
-Ctrl + S
+            <apex:pageMessages />
 
-Step 7: Run Execute Anonymous Window
+            <apex:pageBlockSection columns="2">
 
-In Developer Console:
+                <apex:inputText
+                    value="{!customerName}"
+                    label="Customer Name" />
 
-👉 Debug → Open Execute Anonymous Window
+                <apex:inputText
+                    value="{!email}"
+                    label="Email" />
 
-Shortcut:
-Ctrl + E
+                <apex:inputText
+                    value="{!birthDate}"
+                    label="Birth Date" />
 
-Step 8: Test CRUD Operations
-1️⃣ Add Account
+                <apex:inputText
+                    value="{!department}"
+                    label="Department" />
 
-Paste:
+            </apex:pageBlockSection>
 
-BankAccountSystem.addAccount(
-    'A101',
-    'Omkar',
-    'omkar@gmail.com',
-    Date.newInstance(2003,5,10),
-    'Savings'
-);
+            <apex:commandButton
+                value="Add Customer"
+                action="{!addCustomer}"
+                rerender="customerTable" />
 
-Click:
-👉 Execute
+        </apex:pageBlock>
 
-2️⃣ View Accounts
-BankAccountSystem.viewAccounts();
-3️⃣ Update Account
-BankAccountSystem.updateAccount(
-    'A101',
-    'newmail@gmail.com'
-);
-4️⃣ Delete Account
-BankAccountSystem.deleteAccount('A101');
-Step 9: View Output Logs
+        <apex:pageBlock
+            title="Customer Records"
+            id="customerTable">
 
-In Developer Console:
+            <apex:pageBlockTable
+                value="{!customerList}"
+                var="c">
 
-👉 Logs tab
+                <apex:column value="{!c.Name}" />
+                <apex:column value="{!c.Email__c}" />
+                <apex:column value="{!c.Birth_Date__c}" />
+                <apex:column value="{!c.Department__c}" />
 
-Double click latest log.
+                <apex:column headerValue="Action">
 
-Then search:
-USER_DEBUG
+                    <apex:commandButton
+                        value="Delete"
+                        action="{!deleteCustomer}">
 
-You’ll see:
+                        <apex:param
+                            name="custId"
+                            value="{!c.Id}" />
 
-Account ID: A101
-Name: Omkar
-Email: omkar@gmail.com
-DOB: 2003-05-10
-Department: Savings
-Important Concepts for Viva
-What is Salesforce?
+                    </apex:commandButton>
 
-Salesforce is a cloud-based CRM platform.
+                </apex:column>
 
-CRM = Customer Relationship Management.
+            </apex:pageBlockTable>
 
-What is Apex?
+        </apex:pageBlock>
 
-Apex is Salesforce’s programming language similar to Java.
+    </apex:form>
 
-Used for:
-
-Business logic
-Automation
-Database operations
-What is SOQL?
-
-SOQL = Salesforce Object Query Language
-
-Used to fetch records from Salesforce database.
-
-Example:
-
-SELECT Name FROM BankAccount__c
-What is CRUD?
-Operation	Meaning
-Create	Insert
-Read	Select
-Update	Modify
-Delete	Remove
-Why __c ?
-
-Custom objects and custom fields in Salesforce end with:
-
-__c
-
-Example:
-
-BankAccount__c
-Email__c
-Important Viva Questions
-Difference between Standard Object and Custom Object
-Standard Object	Custom Object
-Predefined by Salesforce	Created by user
-Example: Account	Example: BankAccount
-What is Execute Anonymous?
-
-Used to run Apex code directly without creating UI.
-
-What is System.debug()?
-
-Used to print output in logs.
-
-Example:
-
-System.debug('Hello');
-Common Errors + Fixes
-Invalid field
-
-Means field API name mismatch.
-
-Check:
-Fields & Relationships → API Name
-
-Variable does not exist
-
-Usually typo issue.
-
-Check spelling carefully.
-
-List has no rows for assignment
-
-Occurs when update/delete record not found.
-
-Example:
-
-WHERE Name = :accId
-
-No matching record exists.
+</apex:page>
+How to Run
+Click Preview
+OR open:
+/apex/BankVFPage
