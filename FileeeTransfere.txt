@@ -1,0 +1,151 @@
+CC Practical: Secure File Transfer Between AWS EC2 Instances
+Aim
+
+To establish secure communication between two Amazon EC2 instances inside a VPC and transfer files securely using SSH and SCP.
+The practical demonstrates private networking, secure authentication, and permission control.
+
+Architecture
+Components Used
+Amazon Web Services
+Amazon EC2
+Amazon VPC
+Security Groups
+SSH
+SCP
+Requirements
+AWS Account
+2 Ubuntu EC2 Instances
+Same VPC/Subnet
+.pem Key Pair
+Port 22 enabled in Security Group
+Step 1: Launch Two EC2 Instances
+
+Open:
+
+AWS Console
+
+Launch two Ubuntu EC2 instances:
+
+Instance	Purpose
+Sender-VM	Sends files
+Receiver-VM	Receives files
+Configuration
+Setting	Value
+AMI	Ubuntu Server
+Instance Type	t2.micro
+Network	Same VPC
+Security Group	Allow SSH
+Step 2: Configure Security Group
+
+Add inbound rules:
+
+Type	Protocol	Port	Source
+SSH	TCP	22	Your IP
+Internal Communication	All Traffic	All	Same Security Group
+Step 3: Connect to Sender EC2 Instance
+
+From Windows PowerShell:
+
+cd C:\Users\Lenovo\Downloads
+
+Fix key permissions:
+
+icacls key.pem /inheritance:r
+
+Connect using SSH:
+
+ssh -i "key.pem" ubuntu@ec2-50-19-3-40.compute-1.amazonaws.com
+
+Successful connection output:
+
+Welcome to Ubuntu 26.04 LTS
+Step 4: Verify Private IP
+
+Inside Sender VM:
+
+hostname -I
+
+Output:
+
+172.31.26.92
+
+This is the private IP of the instance.
+
+Step 5: Create Test File on Sender VM
+
+Create file:
+
+echo "cloud comput practical" > sample.txt
+
+Verify:
+
+cat sample.txt
+
+Output:
+
+cloud comput practical
+Step 6: Copy PEM Key to Sender VM
+
+From local PowerShell:
+
+scp -i "key.pem" key.pem ubuntu@ec2-50-19-3-40.compute-1.amazonaws.com:
+
+This uploads the key file into Sender VM for internal communication.
+
+Step 7: Set Key Permissions Inside Sender VM
+
+Inside Sender VM:
+
+chmod 400 key.pem
+Step 8: Verify Receiver VM Connection
+
+Test SSH from Sender VM to Receiver VM:
+
+ssh -i "key.pem" ubuntu@ec2-3-80-136-20.compute-1.amazonaws.com
+
+Successful output:
+
+Welcome to Ubuntu 26.04 LTS
+
+Exit from Receiver VM:
+
+exit
+Step 9: Secure File Transfer Using SCP
+
+Transfer sample.txt from Sender VM to Receiver VM:
+
+scp -i "key.pem" sample.txt ubuntu@3.80.136.20:/home/ubuntu/
+
+Successful output:
+
+sample.txt 100%
+Step 10: Verify File on Receiver VM
+
+Login to Receiver VM:
+
+ssh -i "key.pem" ubuntu@ec2-3-80-136-20.compute-1.amazonaws.com
+
+Check transferred file:
+
+ls
+
+View contents:
+
+cat sample.txt
+
+Expected Output:
+
+cloud comput practical
+Step 11: Secure File Permissions
+
+On Receiver VM:
+
+chmod 600 sample.txt
+
+Verify permissions:
+
+ls -l sample.txt
+
+Expected:
+
+-rw------- 1 ubuntu ubuntu ...
