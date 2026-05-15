@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Simple Chatbot</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial;
+    background:#f4f4f4;
+}
+
+header{
+    background:#007bff;
+    color:white;
+    text-align:center;
+    padding:15px;
+}
+
+nav a{
+    color:white;
+    margin:10px;
+    text-decoration:none;
+}
+
+.card{
+    width:220px;
+    margin:20px;
+    padding:15px;
+    background:white;
+    border-radius:10px;
+    box-shadow:0 0 5px gray;
+}
+
+.card img{
+    width:100%;
+    border-radius:10px;
+}
+
+.btn, button{
+    background:#007bff;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:5px;
+    cursor:pointer;
+    text-decoration:none;
+}
+
+.chatbot{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    width:300px;
+    background:white;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 0 10px gray;
+}
+
+.chat-header{
+    background:#007bff;
+    color:white;
+    text-align:center;
+    padding:10px;
+}
+
+.chat-box{
+    height:250px;
+    padding:10px;
+    overflow-y:auto;
+}
+
+.message{
+    margin:5px 0;
+    padding:8px;
+    border-radius:8px;
+}
+
+.user{
+    background:#d4ffd4;
+    text-align:right;
+}
+
+.bot{
+    background:#eee;
+}
+
+.input-area{
+    display:flex;
+}
+
+input{
+    flex:1;
+    border:none;
+    padding:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>E-Commerce Store</h1>
+
+    <nav>
+        <a href="#">Home</a>
+        <a href="#">Products</a>
+        <a href="#">Orders</a>
+        <a href="#">Contact</a>
+    </nav>
+</header>
+
+<div class="card">
+
+    <img src="https://via.placeholder.com/220x150">
+
+    <h3>Product 1</h3>
+
+    <p>Best quality product.</p>
+
+    <a href="#" class="btn">Buy Now</a>
+
+</div>
+
+
+<!-- Chatbot -->
+
+<div class="chatbot">
+
+    <div class="chat-header">
+        Customer Support
+    </div>
+
+    <div class="chat-box" id="chatBox">
+
+        <div class="message bot">
+            Hello 👋 How can I help you?
+        </div>
+
+    </div>
+
+    <div class="input-area">
+
+        <input type="text" id="userInput" placeholder="Type message">
+
+        <button onclick="sendMessage()">Send</button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function sendMessage(){
+
+    let input = document.getElementById("userInput");
+    let text = input.value.toLowerCase().trim();
+
+    if(text=="") return;
+
+    let chatBox = document.getElementById("chatBox");
+
+    // User Message
+
+    chatBox.innerHTML += `
+    <div class="message user">${input.value}</div>
+    `;
+
+    let reply = "";
+
+    // Chatbot Rules
+
+    if(text.includes("hi") || text.includes("hello")){
+        reply = "Hello 👋 Welcome to our store!";
+    }
+
+    else if(text.includes("price")){
+        reply = "Check prices on Products page.";
+    }
+
+    else if(text.includes("order")){
+        reply = "Track your order in Orders section.";
+    }
+
+    else if(text.includes("delivery")){
+        reply = "Delivery takes 3-5 days.";
+    }
+
+    else if(text.includes("refund")){
+        reply = "Refund is processed within 7 days.";
+    }
+
+    else if(text.includes("contact")){
+        reply = "Email us at support@store.com";
+    }
+
+    else if(text.includes("help")){
+        reply = `
+        • Price <br>
+        • Order <br>
+        • Delivery <br>
+        • Refund <br>
+        • Contact
+        `;
+    }
+
+    else if(text.includes("bye")){
+        reply = "Thank you 😊 Visit again!";
+    }
+
+    else{
+        reply = `
+        Sorry 😔 <br>
+        Type <b>help</b> for commands.
+        `;
+    }
+
+    // Bot Message
+
+    chatBox.innerHTML += `
+    <div class="message bot">${reply}</div>
+    `;
+
+    // Scroll
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // Clear Input
+
+    input.value = "";
+}
+
+
+// Enter Key Support
+
+document.getElementById("userInput")
+.addEventListener("keypress", function(e){
+
+    if(e.key==="Enter"){
+        sendMessage();
+    }
+
+});
+
+</script>
+
+</body>
+</html>
